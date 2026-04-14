@@ -33,9 +33,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Git
+        run: |
+          sudo yum update -y
+          sudo yum install -y git
+
       - name: Install Trivy
         run: |
-          sudo yum install -y wget tar
+          sudo yum install -y wget tar curl
           TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep tag_name | cut -d '"' -f 4)
           wget https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/trivy_${TRIVY_VERSION:1}_Linux-64bit.tar.gz
           tar zxvf trivy_${TRIVY_VERSION:1}_Linux-64bit.tar.gz
@@ -47,7 +52,7 @@ jobs:
 
       - name: Install Gitleaks
         run: |
-          sudo yum install -y wget tar
+          sudo yum install -y wget tar curl
           GITLEAKS_VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep tag_name | cut -d '"' -f 4)
           wget https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION:1}_linux_x64.tar.gz
           tar zxvf gitleaks_${GITLEAKS_VERSION:1}_linux_x64.tar.gz
