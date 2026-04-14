@@ -26,34 +26,29 @@ jobs:
       - name: Build with Maven
         run: mvn compile
 
- security-check:
-  runs-on: self-hosted
-  needs: compile
+  security-check:
+    runs-on: self-hosted
+    needs: compile
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Install Trivy
-      run: |
-        sudo rpm --import https://aquasecurity.github.io/trivy-repo/rpm/public.key
-        sudo tee /etc/yum.repos.d/trivy.repo <<EOF
-        [trivy]
-        name=Trivy repository
-        baseurl=https://aquasecurity.github.io/trivy-repo/rpm/releases/\$basearch/
-        gpgcheck=1
-        enabled=1
-        gpgkey=https://aquasecurity.github.io/trivy-repo/rpm/public.key
-        EOF
-        sudo yum install -y trivy
+      - name: Install Trivy
+        run: |
+          sudo yum install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.50.1/trivy_0.50.1_Linux-64bit.tar.gz
+          tar zxvf trivy_0.50.1_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/trivy
 
-    - name: Trivy Filesystem Scan
-      run: trivy fs --format table -o fs-report.json .
+      - name: Trivy Filesystem Scan
+        run: trivy fs --format table -o fs-report.json .
 
-    - name: Install Gitleaks
-      run: |
-        wget https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64
-        chmod +x gitleaks-linux-amd64
-        sudo mv gitleaks-linux-amd64 /usr/local/bin/gitleaks
+      - name: Install Gitleaks
+        run: |
+          sudo yum install -y wget
+          wget https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64
+          chmod +x gitleaks-linux-amd64
+          sudo mv gitleaks-linux-amd64 /usr/local/bin/gitleaks
 
-    - name: Gitleaks Code Scan
-      run: gitleaks detect --source . -r gitleaks-report.json -f json
+      - name: Gitleaks Code Scan
+        run: gitleaks detect --source . -r gitleaks-report.json -f json
