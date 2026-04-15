@@ -25,7 +25,7 @@ jobs:
           maven-version: 3.9.0
 
       - name: Build Project
-        run: mvn -B compile
+        run: mvn compile
 
 
   security-check:
@@ -36,11 +36,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Required Packages
-        run: |
-          sudo yum update -y
-          sudo yum install -y git wget tar unzip
-
       - name: Install Trivy
         run: |
           TRIVY_VERSION=$(curl -s https://api.github.com/repos/aquasecurity/trivy/releases/latest | grep '"tag_name":' | cut -d '"' -f4)
@@ -49,9 +44,8 @@ jobs:
           sudo mv trivy /usr/local/bin/
           trivy --version
 
-      - name: Run Trivy Filesystem Scan
-        run: |
-          trivy fs . > trivy-report.txt
+      - name: Run Trivy Scan
+        run: trivy fs .
 
       - name: Install Gitleaks
         run: |
@@ -62,5 +56,4 @@ jobs:
           gitleaks version
 
       - name: Run Gitleaks Scan
-        run: |
-          gitleaks detect --source . --report-path gitleaks-report.json --report-format json
+        run: gitleaks detect --source .
