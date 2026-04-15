@@ -38,7 +38,7 @@ jobs:
       - name: Install Required Packages
         run: |
           sudo yum update -y
-          sudo yum install -y git wget tar curl
+          sudo yum install -y git wget tar
 
       - name: Install Trivy
         run: |
